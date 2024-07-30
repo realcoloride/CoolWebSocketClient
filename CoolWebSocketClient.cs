@@ -15,10 +15,36 @@ namespace CoolWebSocketClient
         Binary,
         Close
     }
+    public enum CoolWebSocketError
+    {
+        Success = 0,
+        InvalidMessageType = 1,
+        Faulted = 2,
+        NativeError = 3,
+        NotAWebSocket = 4,
+        UnsupportedVersion = 5,
+        UnsupportedProtocol = 6,
+        HeaderError = 7,
+        ConnectionClosedPrematurely = 8,
+        InvalidState = 9
+    }
+    public enum CoolWebSocketCloseStatus
+    {
+        NormalClosure = 1000,
+        EndpointUnavailable = 1001,
+        ProtocolError = 1002,
+        InvalidMessageType = 1003,
+        Empty = 1005,
+        InvalidPayloadData = 1007,
+        PolicyViolation = 1008,
+        MessageTooBig = 1009,
+        MandatoryExtension = 1010,
+        InternalServerError = 1011
+    }
 
     public delegate void CoolWebSocketOpenEvent();
-    public delegate void CoolWebSocketErrorEvent(WebSocketError errorCode, string errorMessage);
-    public delegate void CoolWebSocketCloseEvent(WebSocketCloseStatus closeStatus, string closeMessage);
+    public delegate void CoolWebSocketErrorEvent(CoolWebSocketError errorCode, string errorMessage);
+    public delegate void CoolWebSocketCloseEvent(CoolWebSocketCloseStatus closeStatus, string closeMessage);
     public delegate void CoolWebSocketMessageEvent(CoolWebSocketMessageType messageType, byte[] message);
 
     public sealed class CoolWebSocket : IDisposable
@@ -46,7 +72,7 @@ namespace CoolWebSocketClient
         private void ThrowIfCloseError()
         {
             if (IsOpen || !WebSocket.CloseStatus.HasValue) return;
-            OnClose?.Invoke(WebSocket.CloseStatus.Value, WebSocket.CloseStatusDescription);
+            OnClose?.Invoke((CoolWebSocketCloseStatus)WebSocket.CloseStatus.Value, WebSocket.CloseStatusDescription);
         }
 
         #endregion
@@ -74,12 +100,12 @@ namespace CoolWebSocketClient
             }
             catch (WebSocketException exception)
             {
-                OnError?.Invoke(exception.WebSocketErrorCode, exception.Message);
+                OnError?.Invoke((CoolWebSocketError)exception.WebSocketErrorCode, exception.Message);
                 ThrowIfCloseError();
             }
             catch (Exception exception)
             {
-                OnError?.Invoke(WebSocketError.Faulted, exception.Message);
+                OnError?.Invoke((CoolWebSocketError)WebSocketError.Faulted, exception.Message);
                 ThrowIfCloseError();
             }
         }
@@ -96,13 +122,13 @@ namespace CoolWebSocketClient
             }
             catch (WebSocketException exception)
             {
-                OnError?.Invoke(exception.WebSocketErrorCode, exception.Message);
+                OnError?.Invoke((CoolWebSocketError)exception.WebSocketErrorCode, exception.Message);
                 ThrowIfCloseError();
                 return;
             }
             catch (Exception exception)
             {
-                OnError?.Invoke(WebSocketError.Faulted, exception.Message);
+                OnError?.Invoke((CoolWebSocketError)WebSocketError.Faulted, exception.Message);
                 ThrowIfCloseError();
                 return;
             }
@@ -111,14 +137,14 @@ namespace CoolWebSocketClient
                 CancellationTokenSource.Cancel();
             }
 
-            OnClose?.Invoke(closeStatus, closeMessage);
+            OnClose?.Invoke((CoolWebSocketCloseStatus)closeStatus, closeMessage);
         }
 
         #endregion
 
         #region Sending
 
-        private async Task Send(dynamic data, WebSocketMessageType messageType = WebSocketMessageType.Binary)
+        private async Task InternalSend(dynamic data, WebSocketMessageType messageType = WebSocketMessageType.Binary)
         {
             if (!IsOpen) return;
 
@@ -128,21 +154,22 @@ namespace CoolWebSocketClient
             }
             catch (WebSocketException exception)
             {
-                OnError?.Invoke(exception.WebSocketErrorCode, exception.Message);
+                OnError?.Invoke((CoolWebSocketError)exception.WebSocketErrorCode, exception.Message);
                 ThrowIfCloseError();
             }
             catch (Exception ex)
             {
-                OnError?.Invoke(WebSocketError.Faulted, ex.Message);
+                OnError?.Invoke((CoolWebSocketError)WebSocketError.Faulted, ex.Message);
                 ThrowIfCloseError();
             }
         }
 
-        public async Task Send(ReadOnlyMemory<byte> data) => await Send(data);
-        public async Task Send(ArraySegment<byte> data) => await Send(data);
+        public async Task Send(ReadOnlyMemory<byte> data) => await InternalSend(data);
+        public async Task Send(ArraySegment<byte> data) => await InternalSend(data);
+        public async Task Send(byte[] data) => await InternalSend(new ReadOnlyMemory<byte>(data));
 
         public async Task Send(string text)
-            => await Send(Encoding.UTF8.GetBytes(text), WebSocketMessageType.Text);
+            => await InternalSend(Encoding.UTF8.GetBytes(text), WebSocketMessageType.Text);
 
         #endregion
 
