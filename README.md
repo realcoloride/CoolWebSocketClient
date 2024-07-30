@@ -2,6 +2,8 @@
 
 CoolWebSocket is a 0 bullshit and straightforward [ClientWebSocket](https://learn.microsoft.com/en-us/dotnet/api/system.net.websockets.clientwebsocket) wrapper that aims at making WebSockets easy and friendly to use, whilst getting the advantages from [ClientWebSocket](https://learn.microsoft.com/en-us/dotnet/api/system.net.websockets.clientwebsocket).
 
+It is lightweight and simple and does not rely on any extra libraries. [The codebase actually fits in one file](https://github.com/realcoloride/CoolWebSocketClient/blob/master/CoolWebSocketClient.cs).
+
 ## Installation
 
 You can install via the [nuget package](https://www.nuget.org/packages/CoolWebSocketClient/) or via the following command: 

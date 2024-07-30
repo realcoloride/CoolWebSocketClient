@@ -111,14 +111,14 @@ namespace CoolWebSocketClient
         }
 
         public async Task Close(
-            WebSocketCloseStatus closeStatus = WebSocketCloseStatus.NormalClosure,
+            CoolWebSocketCloseStatus closeStatus = CoolWebSocketCloseStatus.NormalClosure,
             string closeMessage = null
         ) {
             if (IsOpen) return;
 
             try
             {
-                await WebSocket.CloseAsync(closeStatus, closeMessage, CancellationToken);
+                await WebSocket.CloseAsync((WebSocketCloseStatus)closeStatus, closeMessage, CancellationToken);
             }
             catch (WebSocketException exception)
             {
@@ -137,7 +137,7 @@ namespace CoolWebSocketClient
                 CancellationTokenSource.Cancel();
             }
 
-            OnClose?.Invoke((CoolWebSocketCloseStatus)closeStatus, closeMessage);
+            OnClose?.Invoke(closeStatus, closeMessage);
         }
 
         #endregion
