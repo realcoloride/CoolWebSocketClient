@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <Nullable>enable</Nullable>
+	<LangVersion>12.0</LangVersion>
+	<SignAssembly>False</SignAssembly>
+	<Title>CoolWebSocketClient</Title>
+	<Authors>realcoloride</Authors>
+	<Description>A cool and easy to use WebSocket client based on ClientWebSocket.</Description>
+	<Copyright>realcoloride</Copyright>
+	<PackageProjectUrl>https://github.com/realcoloride/CoolWebSocketClient</PackageProjectUrl>
+	<PackageReadmeFile>README.md</PackageReadmeFile>
+	<RepositoryUrl>https://github.com/realcoloride/CoolWebSocketClient</RepositoryUrl>
+	<PackageTags>websocket; socket; client;</PackageTags>
+	<PackageReleaseNotes>Initial release</PackageReleaseNotes>
+	<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+    <PackageReference Include="System.Net.WebSockets" Version="4.3.0" />
+  </ItemGroup>
+
+</Project>
