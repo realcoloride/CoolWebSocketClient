@@ -114,7 +114,7 @@ namespace CoolWebSocketClient
             CoolWebSocketCloseStatus closeStatus = CoolWebSocketCloseStatus.NormalClosure,
             string closeMessage = null
         ) {
-            if (IsOpen) return;
+            if (!IsOpen) return;
 
             try
             {
