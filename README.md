@@ -14,7 +14,7 @@ dotnet add package CoolWebSocketClient
 
 Basic usage
 
-```
+```cs
 var ws = new CoolWebSocket();
 await ws.Open(new Uri("wss://echo.websocket.org"));
 
