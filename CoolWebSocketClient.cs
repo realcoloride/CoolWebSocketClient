@@ -93,6 +93,7 @@ namespace CoolWebSocketClient
                 Thread = new(new ThreadStart(async () =>
                 {
                     while (IsOpen) await Poll();
+                    ThrowIfCloseError();
                 })) { Name = "CoolWebSocketClientThread" };
                 Thread.Start();
 
@@ -101,12 +102,10 @@ namespace CoolWebSocketClient
             catch (WebSocketException exception)
             {
                 OnError?.Invoke((CoolWebSocketError)exception.WebSocketErrorCode, exception.Message);
-                ThrowIfCloseError();
             }
             catch (Exception exception)
             {
                 OnError?.Invoke((CoolWebSocketError)WebSocketError.Faulted, exception.Message);
-                ThrowIfCloseError();
             }
         }
 
@@ -123,21 +122,17 @@ namespace CoolWebSocketClient
             catch (WebSocketException exception)
             {
                 OnError?.Invoke((CoolWebSocketError)exception.WebSocketErrorCode, exception.Message);
-                ThrowIfCloseError();
                 return;
             }
             catch (Exception exception)
             {
                 OnError?.Invoke((CoolWebSocketError)WebSocketError.Faulted, exception.Message);
-                ThrowIfCloseError();
                 return;
             }
             finally
             {
                 CancellationTokenSource.Cancel();
             }
-
-            OnClose?.Invoke(closeStatus, closeMessage);
         }
 
         #endregion
@@ -155,12 +150,10 @@ namespace CoolWebSocketClient
             catch (WebSocketException exception)
             {
                 OnError?.Invoke((CoolWebSocketError)exception.WebSocketErrorCode, exception.Message);
-                ThrowIfCloseError();
             }
             catch (Exception ex)
             {
                 OnError?.Invoke((CoolWebSocketError)WebSocketError.Faulted, ex.Message);
-                ThrowIfCloseError();
             }
         }
 
