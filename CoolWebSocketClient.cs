@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Buffers;
+using System.Data.Common;
 using System.IO;
 using System.Net.WebSockets;
 using System.Text;
@@ -93,7 +94,6 @@ namespace CoolWebSocketClient
                 Thread = new(new ThreadStart(async () =>
                 {
                     while (IsOpen) await Poll();
-                    ThrowIfCloseError();
                 })) { Name = "CoolWebSocketClientThread" };
                 Thread.Start();
 
@@ -102,10 +102,12 @@ namespace CoolWebSocketClient
             catch (WebSocketException exception)
             {
                 OnError?.Invoke((CoolWebSocketError)exception.WebSocketErrorCode, exception.Message);
+                ThrowIfCloseError();
             }
             catch (Exception exception)
             {
                 OnError?.Invoke((CoolWebSocketError)WebSocketError.Faulted, exception.Message);
+                ThrowIfCloseError();
             }
         }
 
@@ -122,11 +124,13 @@ namespace CoolWebSocketClient
             catch (WebSocketException exception)
             {
                 OnError?.Invoke((CoolWebSocketError)exception.WebSocketErrorCode, exception.Message);
+                ThrowIfCloseError();
                 return;
             }
             catch (Exception exception)
             {
                 OnError?.Invoke((CoolWebSocketError)WebSocketError.Faulted, exception.Message);
+                ThrowIfCloseError();
                 return;
             }
             finally
@@ -150,10 +154,12 @@ namespace CoolWebSocketClient
             catch (WebSocketException exception)
             {
                 OnError?.Invoke((CoolWebSocketError)exception.WebSocketErrorCode, exception.Message);
+                ThrowIfCloseError();
             }
             catch (Exception ex)
             {
                 OnError?.Invoke((CoolWebSocketError)WebSocketError.Faulted, ex.Message);
+                ThrowIfCloseError();
             }
         }
 
@@ -174,7 +180,7 @@ namespace CoolWebSocketClient
         private async Task Poll()
         {
             // keep writing until eom
-            WebSocketReceiveResult result;
+            WebSocketReceiveResult result = null;
             do
             {
                 // rent a temporary buffer
@@ -192,11 +198,17 @@ namespace CoolWebSocketClient
                         MemoryStream.SetLength(0);
                     }
                 }
+                catch (WebSocketException exception)
+                {
+                    OnError?.Invoke((CoolWebSocketError)exception.WebSocketErrorCode, exception.Message);
+                    ThrowIfCloseError();
+                    break;
+                }
                 finally
                 {
                     ArrayPool<byte>.Shared.Return(buffer);
                 }
-            } while (!result.EndOfMessage);
+            } while (result != null && !result.EndOfMessage);
         }
 
         public string ReadString(ArraySegment<byte> message) => Encoding.UTF8.GetString(message);
