@@ -13,10 +13,11 @@
 	<PackageReadmeFile>README.md</PackageReadmeFile>
 	<RepositoryUrl>https://github.com/realcoloride/CoolWebSocketClient</RepositoryUrl>
 	<PackageTags>websocket; socket; client;</PackageTags>
-	<PackageReleaseNotes>Initial release</PackageReleaseNotes>
+	<PackageReleaseNotes>Handle exceptions when disconnected abruptly while polling</PackageReleaseNotes>
 	<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 	<PackageLicenseFile>LICENSE</PackageLicenseFile>
 	<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+	<Version>1.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
