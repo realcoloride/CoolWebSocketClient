@@ -120,6 +120,7 @@ namespace CoolWebSocketClient
             try
             {
                 await WebSocket.CloseAsync((WebSocketCloseStatus)closeStatus, closeMessage, CancellationToken);
+                OnClose?.Invoke(closeStatus, closeMessage);
             }
             catch (WebSocketException exception)
             {
